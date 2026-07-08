@@ -1,0 +1,64 @@
+# Unity generated folders
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Mm]emoryCaptures/
+UserSettings/
+
+# Addressables
+ServerData/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.csproj
+*.sln
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Unity auto-generated files
+*.unityproj
+*.suo
+*.tmp
+*.tmp_proj
+*.pidb.meta
+*.pdb.meta
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Android
+*.keystore
+*.jks
+
+# Crash reports
+sysinfo.txt
+
+# JetBrains Rider
+.idea/
+
+# Visual Studio Code
+.vscode/
+
+# Generated packages
+*.apk
+*.aab
+
+# Backup files
+*.bak
+*.backup
+
+# Ignore Asset Store tools cache
+AssetStoreTools*
