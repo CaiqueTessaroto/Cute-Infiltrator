@@ -62,3 +62,6 @@ sysinfo.txt
 
 # Ignore Asset Store tools cache
 AssetStoreTools*
+
+# Ignore Asset Store 
+Assets/Plugins/ithappy/Cute_Furniture_Free/
