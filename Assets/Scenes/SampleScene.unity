@@ -273,6 +273,7 @@ GameObject:
   - component: {fileID: 78877305}
   - component: {fileID: 78877304}
   - component: {fileID: 78877306}
+  - component: {fileID: 78877307}
   m_Layer: 3
   m_Name: Capsule
   m_TagString: Untagged
@@ -416,7 +417,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 78877299}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 44dc14fa398817643a30d9f7b960998f, type: 3}
   m_Name: 
@@ -430,7 +431,7 @@ MonoBehaviour:
   shotPitchRange: {x: 0.95, y: 1.05}
   firePoint: {fileID: 402807910}
   muzzleFlash: {fileID: 0}
-  shotParticles: {fileID: 963399507}
+  shotParticles: {fileID: 0}
   shotSpeed: 40
   shotLifetime: 0.6
   fireRate: 0.08
@@ -445,6 +446,45 @@ MonoBehaviour:
   - {r: 0.25207186, g: 0, b: 1, a: 1}
   - {r: 0, g: 0.6179762, b: 1, a: 1}
   - {r: 0, g: 1, b: 0.83348227, a: 1}
+  impactParticles: {fileID: 0}
+--- !u!114 &78877307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 78877299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2d3656829247d149bd861813a7e9d1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponShootingLaserBolt
+  fireAction: {fileID: 1120369429361536294, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  shotDamage: 10
+  weaponAudio: {fileID: 0}
+  shotSound: {fileID: 0}
+  impactSound: {fileID: 0}
+  shotPitchRange: {x: 0.95, y: 1.05}
+  firePoint: {fileID: 402807910}
+  muzzleFlash: {fileID: 0}
+  laserBoltPrefab: {fileID: -3890436322557462115, guid: a16a162da86fdbf409fc96df0f4d3471, type: 3}
+  shotSpeed: 50
+  shotLifetime: 0.6
+  fireRate: 0.08
+  autoFire: 0
+  hitLayerMask:
+    serializedVersion: 2
+    m_Bits: 119
+  playerCamera: {fileID: 330585546}
+  aimLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  maxAimDistance: 100
+  rotateWeaponTowardsAim: 0
+  neonColors:
+  - {r: 0, g: 1, b: 1, a: 1}
+  - {r: 1, g: 0, b: 1, a: 1}
+  - {r: 0.6, g: 0, b: 1, a: 1}
   impactParticles: {fileID: 0}
 --- !u!1 &111928883
 GameObject:
@@ -6393,7 +6433,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e823cd5b5d27c0f4b8256e7c12ee3e6d, type: 2}
+  - {fileID: 10308, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
