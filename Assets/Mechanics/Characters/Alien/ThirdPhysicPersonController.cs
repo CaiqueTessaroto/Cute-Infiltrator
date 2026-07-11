@@ -95,6 +95,7 @@ public class ThirdPhysicPersonController : MonoBehaviour
     public GameObject OriginalBody;
     [Tooltip("Escala do player na forma original para teste (ex: personagem pequeno = 0.4,0.4,0.4).")]
     [SerializeField] private Vector3 originalScale = new Vector3(0.4f, 0.4f, 0.4f);
+    private Transform originalFootReference;
 
     private CharacterController controller;
     private Rigidbody rb;
@@ -114,6 +115,13 @@ public class ThirdPhysicPersonController : MonoBehaviour
         DestroyClonedChildren();
 
         transform.localScale = originalScale;
+
+        // Restaura o footReference e o offset originais
+        footReference = originalFootReference;
+        footYOffset = (footReference != null) ? footReference.localPosition.y : 0f;
+
+        controller.height = standingHeight;
+        controller.center = new Vector3(0f, footYOffset + standingHeight / 2f, 0f);
     }
 
     /// <summary>
@@ -141,18 +149,35 @@ public class ThirdPhysicPersonController : MonoBehaviour
         }
     }
 
-    public void ApplyForm(float colliderRadius, float controllerHeight, float moveSpeed, float jumpForce, GameObject objectBody)
+    public void ApplyForm(float colliderRadius, float controllerHeight, float moveSpeed, float jumpForce, GameObject objectBody, Transform footReferenceOverride = null)
     {
+
+        // Redefine o footReference pra essa forma específica
+        if (footReferenceOverride != null)
+        {
+            footReference.position = footReferenceOverride.position;
+            footYOffset = footReference.localPosition.y;
+        }
+        else
+        {
+            GameObject fallbackFoot = new GameObject("Foot (Clone)");
+            fallbackFoot.transform.SetParent(objectBody != null ? objectBody.transform : transform);
+            fallbackFoot.transform.localPosition = Vector3.zero;
+
+            footReference.position = fallbackFoot.transform.position;
+            footYOffset = 0f;
+        }
+
         DestroyClonedChildren(exclude: objectBody);
 
-        usePhysicsMovement = false; // força o modo Transform, porque o CharacterController não funciona com Rigidbody ativo
+        usePhysicsMovement = true;
         visualBody.gameObject.SetActive(false);
 
         sphereRadius = colliderRadius;
         walkSpeed = moveSpeed;
         physicsMoveSpeed = moveSpeed;
         physicsJumpForce = jumpForce;
-        jumpHeight = jumpForce; // ajuste a conversão conforme sua fórmula
+        jumpHeight = jumpForce;
 
         visualBody = objectBody?.transform;
 
@@ -197,6 +222,7 @@ public class ThirdPhysicPersonController : MonoBehaviour
             }
         }
 
+        originalFootReference = footReference;
         footYOffset = (footReference != null) ? footReference.localPosition.y : 0f;
 
         controller.height = standingHeight;
@@ -360,14 +386,24 @@ public class ThirdPhysicPersonController : MonoBehaviour
         }
     }
 
+    [Tooltip("Margem extra além do sphereRadius para o SphereCast de chão (não é mais a distância total - é só a folga).")]
+    public float groundCheckMargin = 0.05f;
+
     bool IsGroundedPhysics()
     {
-        if (visualBody == null || visualBodyCollider == null) return false;
+        if (footReference == null) return false;
 
-        // Usa a posição e o raio reais da esfera física, em vez de um cálculo aproximado.
-        Vector3 origin = visualBody.position;
-        float radius = visualBodyCollider.radius * visualBody.lossyScale.x; // considera escala do transform
-        return Physics.SphereCast(origin, radius * 0.9f, Vector3.down, out _, groundCheckDistance, groundMask, QueryTriggerInteraction.Ignore);
+        float radius = sphereRadius * 0.9f;
+
+        // Origem logo acima do pé, só o suficiente pra sphere não nascer cravada no chão
+        Vector3 origin = footReference.position + Vector3.up * radius;
+        float castDistance = radius + groundCheckMargin;
+
+        bool hit = Physics.SphereCast(origin, radius, Vector3.down, out RaycastHit hitInfo, castDistance, groundMask, QueryTriggerInteraction.Ignore);
+
+        //Debug.Log($"[IsGroundedPhysics] origin={origin}, radius={radius}, castDistance={castDistance}, hit={hit}, hitDistance={(hit ? hitInfo.distance.ToString() : "N/A")}");
+
+        return hit;
     }
 
     void HandleMovementPhysicsFixed()
@@ -437,4 +473,26 @@ public class ThirdPhysicPersonController : MonoBehaviour
         cameraTransform.position = cameraPivot.position + orbitDirection * desiredDistance;
         cameraTransform.rotation = orbitRotation;
     }
+
+
+    void OnDrawGizmosSelected()
+    {
+        if (footReference == null) return;
+
+        float radius = sphereRadius * 0.9f;
+        Vector3 origin = footReference.position + Vector3.up * radius;
+        float castDistance = radius + groundCheckMargin;
+        Vector3 endPoint = origin + Vector3.down * castDistance;
+
+        bool grounded = Application.isPlaying && usePhysicsMovement && IsGroundedPhysics();
+        Gizmos.color = grounded ? Color.green : Color.red;
+
+        Gizmos.DrawWireSphere(origin, radius);
+        Gizmos.DrawWireSphere(endPoint, radius);
+        Gizmos.DrawLine(origin, endPoint);
+
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(footReference.position, 0.02f);
+    }
+
 }

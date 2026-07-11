@@ -126,13 +126,24 @@ public class ShapeshiftAbility : MonoBehaviour
 
         if (spawnedVisual != null) Destroy(spawnedVisual);
 
+        Transform footChild = null;
+
         if (data.visualPrefab != null)
         {
             spawnedVisual = Instantiate(data.visualPrefab, gameObject.transform);
             spawnedVisual.transform.localPosition = Vector3.zero;
             spawnedVisual.transform.localScale = Vector3.one * data.visualScale;
 
-            EnsureCollider(spawnedVisual);
+            TryGetRendererBounds(spawnedVisual, out Bounds bounds);
+
+            EnsureCollider(spawnedVisual, bounds);
+
+            // Prioriza um "Foot" manual dentro do prefab, se existir; senão calcula pelos bounds.
+            footChild = FindFootReference(spawnedVisual.transform);
+            if (footChild == null)
+            {
+                footChild = CreateFootFromBounds(bounds, gameObject.transform);
+            }
         }
         else
         {
@@ -144,18 +155,62 @@ public class ShapeshiftAbility : MonoBehaviour
             controllerHeight: data.controllerHeight,
             moveSpeed: data.moveSpeed,
             jumpForce: data.jumpForce,
-            objectBody: spawnedVisual
+            objectBody: spawnedVisual,
+            footReferenceOverride: footChild
         );
     }
 
-    /// <summary>
-    /// Garante que o visual instanciado tenha algum Collider. Se não tiver nenhum
-    /// (nem no próprio objeto, nem em filhos), adiciona um BoxCollider ajustado
-    /// ao tamanho visual do Renderer.
-    /// </summary>
-    void EnsureCollider(GameObject target)
+    Transform FindFootReference(Transform root)
     {
-        // Já existe algum collider no objeto ou em algum filho?
+        foreach (Transform t in root.GetComponentsInChildren<Transform>(includeInactive: true))
+        {
+            if (t.name == "Foot")
+            {
+                return t;
+            }
+        }
+        return null;
+    }
+    /// <summary>
+    /// Calcula os bounds combinados de todos os Renderers do objeto, em espaço de mundo.
+    /// Retorna false se não houver nenhum Renderer.
+    /// </summary>
+    bool TryGetRendererBounds(GameObject target, out Bounds bounds)
+    {
+        Renderer[] renderers = target.GetComponentsInChildren<Renderer>();
+        if (renderers.Length == 0)
+        {
+            bounds = default;
+            return false;
+        }
+
+        bounds = renderers[0].bounds;
+        for (int i = 1; i < renderers.Length; i++)
+        {
+            bounds.Encapsulate(renderers[i].bounds);
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Cria um GameObject vazio na base (Y mínimo) dos bounds fornecidos, como filho
+    /// direto do player. Nomeado com sufixo "(Clone)" de propósito, pra ser destruído
+    /// automaticamente pelo DestroyClonedChildren do controller (junto com o resto do
+    /// visual antigo) quando o player transformar de novo ou reverter.
+    /// </summary>
+    Transform CreateFootFromBounds(Bounds bounds, Transform parent)
+    {
+        GameObject footGO = new GameObject("Foot (Clone)");
+        footGO.transform.SetParent(parent);
+        footGO.transform.position = new Vector3(bounds.center.x, bounds.min.y, bounds.center.z);
+
+        Debug.Log($"[Shapeshift] Foot criado automaticamente na posição Y (mundo) = {bounds.min.y}");
+
+        return footGO.transform;
+    }
+
+    void EnsureCollider(GameObject target, Bounds bounds)
+    {
         Collider existing = target.GetComponentInChildren<Collider>();
         if (existing != null)
         {
@@ -165,29 +220,11 @@ public class ShapeshiftAbility : MonoBehaviour
 
         BoxCollider box = target.AddComponent<BoxCollider>();
 
-        // Tenta ajustar o tamanho do BoxCollider aos bounds visuais reais (soma todos os Renderers filhos).
-        Renderer[] renderers = target.GetComponentsInChildren<Renderer>();
-        if (renderers.Length > 0)
-        {
-            Bounds bounds = renderers[0].bounds;
-            for (int i = 1; i < renderers.Length; i++)
-            {
-                bounds.Encapsulate(renderers[i].bounds);
-            }
+        box.center = target.transform.InverseTransformPoint(bounds.center);
+        box.size = target.transform.InverseTransformVector(bounds.size);
+        box.size = new Vector3(Mathf.Abs(box.size.x), Mathf.Abs(box.size.y), Mathf.Abs(box.size.z));
 
-            // bounds está em espaço de mundo - converte pro espaço local do target
-            box.center = target.transform.InverseTransformPoint(bounds.center);
-            box.size = target.transform.InverseTransformVector(bounds.size);
-
-            // Garante valores positivos (InverseTransformVector pode inverter sinal dependendo da escala)
-            box.size = new Vector3(Mathf.Abs(box.size.x), Mathf.Abs(box.size.y), Mathf.Abs(box.size.z));
-
-            Debug.Log($"[Shapeshift] BoxCollider adicionado em '{target.name}', ajustado ao Renderer (size = {box.size}).");
-        }
-        else
-        {
-            Debug.LogWarning($"[Shapeshift] '{target.name}' não tem Renderer - BoxCollider adicionado com tamanho padrão (1,1,1).");
-        }
+        Debug.Log($"[Shapeshift] BoxCollider adicionado em '{target.name}', ajustado ao Renderer (size = {box.size}).");
     }
 
 
