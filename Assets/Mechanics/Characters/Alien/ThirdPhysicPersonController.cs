@@ -91,6 +91,11 @@ public class ThirdPhysicPersonController : MonoBehaviour
     [Tooltip("Altura do pivot da câmera, relativa ao pé do personagem.")]
     public float pivotY = 1.6f;
 
+    [Header("Trasformação")]
+    public GameObject OriginalBody;
+    [Tooltip("Escala do player na forma original para teste (ex: personagem pequeno = 0.4,0.4,0.4).")]
+    [SerializeField] private Vector3 originalScale = new Vector3(0.4f, 0.4f, 0.4f);
+
     private CharacterController controller;
     private Rigidbody rb;
     private SphereCollider visualBodyCollider; // já existe no visualBody; o Rigidbody usa colliders de filhos automaticamente
@@ -100,6 +105,65 @@ public class ThirdPhysicPersonController : MonoBehaviour
     private float footYOffset = 0f;
     private Vector3 pivotLocalPos;
     private bool appliedModeLastFrame; // para detectar troca do bool em runtime (ex: via Inspector em Play Mode)
+
+    public void ApllyOriginalForm()
+    {
+        visualBody = OriginalBody.transform;
+        OriginalBody.SetActive(true);
+        usePhysicsMovement = true;
+        DestroyClonedChildren();
+
+        transform.localScale = originalScale;
+    }
+
+    /// <summary>
+    /// Destrói qualquer filho direto de gameObject cujo nome termine com "(Clone)",
+    /// ou seja, qualquer visual instanciado dinamicamente pelo ShapeshiftAbility.
+    /// Não afeta o visualBody original nem outros filhos "fixos" da hierarquia.
+    /// </summary>
+    void DestroyClonedChildren(GameObject exclude = null)
+    {
+        // Percorre de trás pra frente porque vamos remover filhos durante o loop
+        for (int i = transform.childCount - 1; i >= 0; i--)
+        {
+            Transform child = transform.GetChild(i);
+
+            if (exclude != null && child.gameObject == exclude)
+            {
+                continue; // não destrói o objeto excluído
+            }
+
+            if (child.name.EndsWith("(Clone)"))
+            {
+                Debug.Log($"[ThirdPhysicPersonController] Destruindo clone: {child.name}");
+                Destroy(child.gameObject);
+            }
+        }
+    }
+
+    public void ApplyForm(float colliderRadius, float controllerHeight, float moveSpeed, float jumpForce, GameObject objectBody)
+    {
+        DestroyClonedChildren(exclude: objectBody);
+
+        usePhysicsMovement = false; // força o modo Transform, porque o CharacterController não funciona com Rigidbody ativo
+        visualBody.gameObject.SetActive(false);
+
+        sphereRadius = colliderRadius;
+        walkSpeed = moveSpeed;
+        physicsMoveSpeed = moveSpeed;
+        physicsJumpForce = jumpForce;
+        jumpHeight = jumpForce; // ajuste a conversão conforme sua fórmula
+
+        visualBody = objectBody?.transform;
+
+        controller.height = controllerHeight;
+        controller.center = new Vector3(0f, footYOffset + controllerHeight / 2f, 0f);
+
+        if (visualBodyCollider != null)
+            visualBodyCollider.radius = colliderRadius;
+
+        transform.localScale = Vector3.one;
+    }
 
     void OnEnable()
     {
