@@ -10,11 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a9c8a6102c57d0c42bd03fbe153925c5, type: 3}
-  m_Name: Guitar
+  m_Name: Furniture
   m_EditorClassIdentifier: Assembly-CSharp::TransformableObjectData
-  formName: Guitar
-  visualPrefab: {fileID: 6093456521913328735, guid: 2bbce9741ba19a84ca5b3b8d7591d2ba, type: 3}
+  formName: Furniture
+  visualPrefab: {fileID: 0}
   visualScale: 1
+  usePhysicsMovement: 0
   colliderRadius: 0.5
   controllerHeight: 1
   moveSpeed: 5

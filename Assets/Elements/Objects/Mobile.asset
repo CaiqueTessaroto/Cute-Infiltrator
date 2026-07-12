@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a9c8a6102c57d0c42bd03fbe153925c5, type: 3}
-  m_Name: Toy
+  m_Name: Mobile
   m_EditorClassIdentifier: Assembly-CSharp::TransformableObjectData
-  formName: Toy
-  visualPrefab: {fileID: 99033065415051577, guid: b3a999724602a5b4f9ae701f9425ca0d, type: 3}
+  formName: Mobile
+  visualPrefab: {fileID: 0}
   visualScale: 1
   colliderRadius: 0.5
   controllerHeight: 1

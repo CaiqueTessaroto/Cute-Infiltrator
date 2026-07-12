@@ -12,6 +12,7 @@ public class TransformableObjectData : ScriptableObject
     public float visualScale = 1f;
 
     [Header("Física / Collider")]
+    public bool usePhysicsMovement = true;
     public float colliderRadius = 0.5f;
     public float controllerHeight = 1f;
 

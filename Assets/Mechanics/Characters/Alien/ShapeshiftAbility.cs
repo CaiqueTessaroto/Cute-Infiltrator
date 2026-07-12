@@ -20,6 +20,9 @@ public class ShapeshiftAbility : MonoBehaviour
     [Header("Forma original (pra poder reverter)")]
     [SerializeField] private TransformableObjectData originalFormData;
 
+    [Header("Formas")]
+    public TransformableObjectData basicData;
+
     // Buffer reutilizável pra evitar alocação de array a cada frame
     private readonly Collider[] detectionBuffer = new Collider[16];
     private ThirdPhysicPersonController controller;
@@ -52,7 +55,7 @@ public class ShapeshiftAbility : MonoBehaviour
         {
             if (currentTarget != null)
             {
-                TransformInto(currentTarget.data);
+                TransformInto(currentTarget);
             }
             else
             {
@@ -114,11 +117,13 @@ public class ShapeshiftAbility : MonoBehaviour
         }
     }
 
-    void TransformInto(TransformableObjectData data)
+    void TransformInto(TransformableObject target)
     {
+        TransformableObjectData data = target.data != null ? target.data : basicData;
+
         if (data == null)
         {
-            Debug.LogError("[Shapeshift] TransformableObjectData é NULL - o TransformableObject do alvo não tem 'data' atribuído no Inspector.");
+            Debug.LogError($"[Shapeshift] '{target.name}' não tem TransformableObjectData atribuído.");
             return;
         }
 
@@ -126,28 +131,32 @@ public class ShapeshiftAbility : MonoBehaviour
 
         if (spawnedVisual != null) Destroy(spawnedVisual);
 
+        GameObject visualSource = target.GetVisualSource();
+
         Transform footChild = null;
 
-        if (data.visualPrefab != null)
+        if (visualSource != null)
         {
-            spawnedVisual = Instantiate(data.visualPrefab, gameObject.transform);
+            spawnedVisual = Instantiate(visualSource, gameObject.transform);
             spawnedVisual.transform.localPosition = Vector3.zero;
             spawnedVisual.transform.localScale = Vector3.one * data.visualScale;
 
-            TryGetRendererBounds(spawnedVisual, out Bounds bounds);
+            // Se clonamos o objeto da cena, ele já tem Collider/TransformableObject/highlight —
+            // remove esses componentes do clone, senão o player carrega um "player transformável" dentro dele.
+            StripSceneOnlyComponents(spawnedVisual);
 
+            TryGetRendererBounds(spawnedVisual, out Bounds bounds);
             EnsureCollider(spawnedVisual, bounds);
 
-            // Prioriza um "Foot" manual dentro do prefab, se existir; senão calcula pelos bounds.
             footChild = FindFootReference(spawnedVisual.transform);
             if (footChild == null)
             {
-                footChild = CreateFootFromBounds(bounds, gameObject.transform);
+                footChild = CreateFootFromBounds(bounds, spawnedVisual.transform);
             }
         }
         else
         {
-            Debug.LogWarning($"[Shapeshift] '{data.formName}' não tem visualPrefab atribuído.");
+            Debug.LogWarning($"[Shapeshift] '{data.formName}' não tem visual disponível (nem visualPrefab, nem gameObject de origem).");
         }
 
         controller.ApplyForm(
@@ -155,9 +164,32 @@ public class ShapeshiftAbility : MonoBehaviour
             controllerHeight: data.controllerHeight,
             moveSpeed: data.moveSpeed,
             jumpForce: data.jumpForce,
+            physicsMovement: data.usePhysicsMovement,
             objectBody: spawnedVisual,
             footReferenceOverride: footChild
         );
+    }
+
+    /// <summary>
+    /// Remove componentes que só fazem sentido no objeto original da cena (não no
+    /// clone visual que vira parte do player). Evita, por exemplo, o clone ter seu
+    /// próprio TransformableObject e ser detectável/transformável de novo, ou ter
+    /// um Collider extra além do que EnsureCollider vai gerenciar.
+    /// </summary>
+    void StripSceneOnlyComponents(GameObject clone)
+    {
+        // TransformableObject não deve existir no clone (senão o player "é" um objeto transformável)
+        foreach (var t in clone.GetComponentsInChildren<TransformableObject>(includeInactive: true))
+        {
+            Destroy(t);
+        }
+
+        // Colliders do objeto original também são removidos - EnsureCollider decide
+        // se precisa recriar um, baseado nos bounds visuais.
+        //foreach (var c in clone.GetComponentsInChildren<Collider>(includeInactive: true))
+        //{
+        //    Destroy(c);
+        //}
     }
 
     Transform FindFootReference(Transform root)

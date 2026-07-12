@@ -149,7 +149,7 @@ public class ThirdPhysicPersonController : MonoBehaviour
         }
     }
 
-    public void ApplyForm(float colliderRadius, float controllerHeight, float moveSpeed, float jumpForce, GameObject objectBody, Transform footReferenceOverride = null)
+    public void ApplyForm(float colliderRadius, float controllerHeight, float moveSpeed, float jumpForce, bool physicsMovement, GameObject objectBody, Transform footReferenceOverride = null)
     {
 
         // Redefine o footReference pra essa forma específica
@@ -170,7 +170,7 @@ public class ThirdPhysicPersonController : MonoBehaviour
 
         DestroyClonedChildren(exclude: objectBody);
 
-        usePhysicsMovement = true;
+        usePhysicsMovement = physicsMovement;
         visualBody.gameObject.SetActive(false);
 
         sphereRadius = colliderRadius;
