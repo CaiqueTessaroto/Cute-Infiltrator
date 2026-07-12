@@ -23,5 +23,6 @@ public class TransformableObjectData : ScriptableObject
 
     [Header("Habilidade especial (opcional)")]
     [Tooltip("Ex: 'explode', 'flutua', 'atravessa grade fina' - trate isso no ShapeshiftAbility ou num script separado por forma.")]
+    public float detectionRange = 6f;
     public string specialAbilityId;
 }

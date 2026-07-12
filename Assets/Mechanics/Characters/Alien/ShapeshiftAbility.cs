@@ -12,7 +12,7 @@ public class ShapeshiftAbility : MonoBehaviour
     [Tooltip("Centro da esfera de detecção - geralmente o próprio player.")]
     [SerializeField] private Transform detectionOrigin;
     [Tooltip("Raio da esfera de detecção.")]
-    [SerializeField] private float detectionRange = 6f;
+    [SerializeField] private float detectionRange = 0.5f;
     [Tooltip("De onde vem a direção 'pra onde estou olhando' - geralmente a câmera. Usado só pra priorizar entre múltiplos alvos na área.")]
     [SerializeField] private Transform aimDirectionReference;
     [SerializeField] private LayerMask transformableLayers;
@@ -22,6 +22,9 @@ public class ShapeshiftAbility : MonoBehaviour
 
     [Header("Formas")]
     public TransformableObjectData basicData;
+
+
+    private float detectionRangeOriginal;
 
     // Buffer reutilizável pra evitar alocação de array a cada frame
     private readonly Collider[] detectionBuffer = new Collider[16];
@@ -33,6 +36,8 @@ public class ShapeshiftAbility : MonoBehaviour
     void Awake()
     {
         controller = GetComponent<ThirdPhysicPersonController>();
+
+        detectionRangeOriginal = detectionRange;
     }
 
     void OnEnable()
@@ -66,6 +71,7 @@ public class ShapeshiftAbility : MonoBehaviour
         if (revertAction.action.WasPressedThisFrame() && currentForm != originalFormData)
         {
             controller.ApllyOriginalForm();
+            detectionRange = detectionRangeOriginal;
             //TransformInto(originalFormData);
         }
     }
@@ -120,6 +126,8 @@ public class ShapeshiftAbility : MonoBehaviour
     void TransformInto(TransformableObject target)
     {
         TransformableObjectData data = target.data != null ? target.data : basicData;
+
+        detectionRange = data.detectionRange;
 
         if (data == null)
         {

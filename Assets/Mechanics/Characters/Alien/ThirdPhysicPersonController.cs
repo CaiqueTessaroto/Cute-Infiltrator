@@ -116,6 +116,8 @@ public class ThirdPhysicPersonController : MonoBehaviour
 
         transform.localScale = originalScale;
 
+        jumpHeight = 1.2f;
+
         // Restaura o footReference e o offset originais
         footReference = originalFootReference;
         footYOffset = (footReference != null) ? footReference.localPosition.y : 0f;
@@ -362,7 +364,7 @@ public class ThirdPhysicPersonController : MonoBehaviour
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
-        
+
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
     }
