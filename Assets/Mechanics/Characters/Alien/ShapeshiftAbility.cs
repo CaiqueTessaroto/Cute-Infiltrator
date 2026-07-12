@@ -12,7 +12,7 @@ public class ShapeshiftAbility : MonoBehaviour
     [Tooltip("Centro da esfera de detecção - geralmente o próprio player.")]
     [SerializeField] private Transform detectionOrigin;
     [Tooltip("Raio da esfera de detecção.")]
-    [SerializeField] private float detectionRange = 4f;
+    [SerializeField] private float detectionRange = 6f;
     [Tooltip("De onde vem a direção 'pra onde estou olhando' - geralmente a câmera. Usado só pra priorizar entre múltiplos alvos na área.")]
     [SerializeField] private Transform aimDirectionReference;
     [SerializeField] private LayerMask transformableLayers;

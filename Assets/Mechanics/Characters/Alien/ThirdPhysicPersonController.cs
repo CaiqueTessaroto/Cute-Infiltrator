@@ -301,6 +301,7 @@ public class ThirdPhysicPersonController : MonoBehaviour
             rb.useGravity = false;
             if (visualBodyCollider != null) visualBodyCollider.enabled = false; // evita colidir "em dobro" com o CharacterController
             controller.enabled = true;
+
         }
 
         appliedModeLastFrame = usePhysicsMovement;
@@ -326,6 +327,8 @@ public class ThirdPhysicPersonController : MonoBehaviour
     void HandleMovementTransform()
     {
         bool isGrounded = controller.isGrounded;
+
+        //Debug.Log($"[Transform] isGrounded={isGrounded}, controller.center={controller.center}, controller.height={controller.height}, controller.radius={controller.radius}, controller.skinWidth={controller.skinWidth}, footYOffset={footYOffset}, transform.position.y={transform.position.y}");
 
         if (isGrounded && velocity.y < 0)
         {
@@ -359,11 +362,10 @@ public class ThirdPhysicPersonController : MonoBehaviour
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
-
+        
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
     }
-
     // ---------------------------------------------------------------
     // MODO FÍSICA (Rigidbody) - esfera rola de verdade
     // ---------------------------------------------------------------
