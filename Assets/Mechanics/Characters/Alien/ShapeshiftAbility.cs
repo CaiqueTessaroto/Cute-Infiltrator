@@ -25,7 +25,6 @@ public class ShapeshiftAbility : MonoBehaviour
 
 
     private float detectionRangeOriginal;
-
     // Buffer reutilizável pra evitar alocação de array a cada frame
     private readonly Collider[] detectionBuffer = new Collider[16];
     private ThirdPhysicPersonController controller;
@@ -173,6 +172,8 @@ public class ShapeshiftAbility : MonoBehaviour
             moveSpeed: data.moveSpeed,
             jumpForce: data.jumpForce,
             physicsMovement: data.usePhysicsMovement,
+            newGroundMask: data.groundMask,
+            excludedLayers: data.excludedLayers,
             objectBody: spawnedVisual,
             footReferenceOverride: footChild
         );

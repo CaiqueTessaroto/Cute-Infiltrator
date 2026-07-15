@@ -15,6 +15,10 @@ public class TransformableObjectData : ScriptableObject
     public bool usePhysicsMovement = true;
     public float colliderRadius = 0.5f;
     public float controllerHeight = 1f;
+    public LayerMask groundMask = ~0;
+
+    [Tooltip("Layers que o Rigidbody do player deve IGNORAR (não colidir) enquanto nessa forma.")]
+    public LayerMask excludedLayers;
 
     [Header("Movimento")]
     public float moveSpeed = 5f;

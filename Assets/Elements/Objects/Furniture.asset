@@ -18,7 +18,14 @@ MonoBehaviour:
   usePhysicsMovement: 0
   colliderRadius: 0.5
   controllerHeight: 1
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 1535
+  excludedLayers:
+    serializedVersion: 2
+    m_Bits: 512
   moveSpeed: 5
-  jumpForce: 6
+  jumpForce: 2
   canJump: 1
+  detectionRange: 2
   specialAbilityId: 

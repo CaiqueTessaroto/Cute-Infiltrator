@@ -106,6 +106,8 @@ public class ThirdPhysicPersonController : MonoBehaviour
     private float footYOffset = 0f;
     private Vector3 pivotLocalPos;
     private bool appliedModeLastFrame; // para detectar troca do bool em runtime (ex: via Inspector em Play Mode)
+    private LayerMask originalGroundMask;
+    private int originalLayer;
 
     public void ApllyOriginalForm()
     {
@@ -115,6 +117,11 @@ public class ThirdPhysicPersonController : MonoBehaviour
         DestroyClonedChildren();
 
         transform.localScale = originalScale;
+
+        groundMask = originalGroundMask;
+        gameObject.layer = originalLayer;
+        //rb.excludeLayers = originalExcludeLayers;
+        controller.excludeLayers = 0;
 
         jumpHeight = 1.2f;
 
@@ -151,8 +158,12 @@ public class ThirdPhysicPersonController : MonoBehaviour
         }
     }
 
-    public void ApplyForm(float colliderRadius, float controllerHeight, float moveSpeed, float jumpForce, bool physicsMovement, GameObject objectBody, Transform footReferenceOverride = null)
+    public void ApplyForm(float colliderRadius, float controllerHeight, float moveSpeed, float jumpForce, bool physicsMovement, LayerMask newGroundMask, LayerMask excludedLayers, GameObject objectBody, Transform footReferenceOverride = null)
     {
+
+        usePhysicsMovement = physicsMovement;
+        if (!usePhysicsMovement)
+            rb.isKinematic = true;
 
         // Redefine o footReference pra essa forma específica
         if (footReferenceOverride != null)
@@ -172,7 +183,6 @@ public class ThirdPhysicPersonController : MonoBehaviour
 
         DestroyClonedChildren(exclude: objectBody);
 
-        usePhysicsMovement = physicsMovement;
         visualBody.gameObject.SetActive(false);
 
         sphereRadius = colliderRadius;
@@ -180,6 +190,11 @@ public class ThirdPhysicPersonController : MonoBehaviour
         physicsMoveSpeed = moveSpeed;
         physicsJumpForce = jumpForce;
         jumpHeight = jumpForce;
+        groundMask = newGroundMask;
+
+        controller.excludeLayers = excludedLayers;
+
+        //gameObject.layer = LayerMaskToLayer(newObjectLayer);
 
         visualBody = objectBody?.transform;
 
@@ -190,6 +205,20 @@ public class ThirdPhysicPersonController : MonoBehaviour
             visualBodyCollider.radius = colliderRadius;
 
         transform.localScale = Vector3.one;
+    }
+
+    private int LayerMaskToLayer(LayerMask mask)
+    {
+        int value = mask.value;
+        if (value == 0) return gameObject.layer; // nada marcado, mantém a atual
+
+        int layerNumber = 0;
+        while ((value & 1) == 0)
+        {
+            value >>= 1;
+            layerNumber++;
+        }
+        return layerNumber;
     }
 
     void OnEnable()
@@ -210,6 +239,9 @@ public class ThirdPhysicPersonController : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         rb = GetComponent<Rigidbody>();
+
+        originalGroundMask = groundMask;
+        originalLayer = gameObject.layer;
 
         if (visualBody != null)
         {

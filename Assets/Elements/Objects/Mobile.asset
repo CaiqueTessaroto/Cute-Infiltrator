@@ -15,9 +15,17 @@ MonoBehaviour:
   formName: Mobile
   visualPrefab: {fileID: 0}
   visualScale: 1
+  usePhysicsMovement: 1
   colliderRadius: 0.5
   controllerHeight: 1
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  excludedLayers:
+    serializedVersion: 2
+    m_Bits: 0
   moveSpeed: 5
   jumpForce: 6
   canJump: 1
+  detectionRange: 1
   specialAbilityId: 
