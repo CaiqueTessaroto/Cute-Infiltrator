@@ -1789,7 +1789,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &625906058
 Transform:
   m_ObjectHideFlags: 0
@@ -1855,6 +1855,7 @@ MonoBehaviour:
   OriginalBody: {fileID: 307386572}
   originalScale: {x: 0.4, y: 0.4, z: 0.4}
   groundCheckMargin: 0.05
+  cameraCollisionBuffer: 0.05
 --- !u!54 &625906060
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -13090,7 +13091,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1937939206
 MonoBehaviour:
   m_ObjectHideFlags: 0

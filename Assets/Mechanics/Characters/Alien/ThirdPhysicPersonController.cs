@@ -197,7 +197,6 @@ public class ThirdPhysicPersonController : MonoBehaviour
         groundMask = newGroundMask;
 
         controller.excludeLayers = excludedLayers;
-
         //gameObject.layer = LayerMaskToLayer(newObjectLayer);
 
         visualBody = objectBody?.transform;
@@ -496,22 +495,44 @@ public class ThirdPhysicPersonController : MonoBehaviour
     /// segue a posição do player mas não gira sozinho. Roda depois do movimento, para
     /// a câmera já orbitar em torno da posição atualizada do player no mesmo frame.
     /// </summary>
+    [Header("Colisão da Câmera")]
+    [Tooltip("Margem extra além do near clip plane da câmera, para não colar na parede.")]
+    public float cameraCollisionBuffer = 0.05f;
+
     void HandleCameraOrbit()
     {
         if (cameraPivot == null || cameraTransform == null) return;
 
         Quaternion orbitRotation = Quaternion.Euler(pitch, yaw, 0f);
-        Vector3 orbitDirection = orbitRotation * Vector3.back; // "para trás" a partir do olhar da câmera
+        Vector3 orbitDirection = orbitRotation * Vector3.back;
 
         float desiredDistance = cameraDistance;
 
-        if (cameraCollision &&
-            Physics.SphereCast(cameraPivot.position, cameraCollisionRadius, orbitDirection, out RaycastHit hit, cameraDistance, cameraCollisionMask, QueryTriggerInteraction.Ignore))
+        // Distância mínima segura = near clip da câmera + margem, nunca menos que isso
+        Camera cam = cameraTransform.GetComponent<Camera>();
+        float minDistance = (cam != null ? cam.nearClipPlane : 0.05f) + cameraCollisionBuffer;
+
+        if (cameraCollision)
         {
-            desiredDistance = Mathf.Max(hit.distance, 0.2f);
+            // SphereCast principal, ignorando a camada do próprio player
+            LayerMask effectiveMask = cameraCollisionMask & ~(1 << gameObject.layer);
+
+            if (Physics.SphereCast(cameraPivot.position, cameraCollisionRadius, orbitDirection,
+                out RaycastHit hit, cameraDistance, effectiveMask, QueryTriggerInteraction.Ignore))
+            {
+                desiredDistance = hit.distance;
+            }
+
+            // Raycast extra fino, cobre cantos que o SphereCast (mais largo) às vezes escapa
+            if (Physics.Raycast(cameraPivot.position, orbitDirection, out RaycastHit thinHit,
+                cameraDistance, effectiveMask, QueryTriggerInteraction.Ignore))
+            {
+                desiredDistance = Mathf.Min(desiredDistance, thinHit.distance);
+            }
+
+            desiredDistance = Mathf.Max(desiredDistance, minDistance);
         }
 
-        // Posição em coordenadas esféricas: pivot (centro da órbita) + direção * distância.
         cameraTransform.position = cameraPivot.position + orbitDirection * desiredDistance;
         cameraTransform.rotation = orbitRotation;
     }
