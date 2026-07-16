@@ -120,20 +120,21 @@ public class ThirdPhysicPersonController : MonoBehaviour
 
         groundMask = originalGroundMask;
         gameObject.layer = originalLayer;
-        //rb.excludeLayers = originalExcludeLayers;
-        
-        rb.isKinematic = false;
-        controller.excludeLayers = 0;
+
+        // Reatribui o collider correto ANTES de qualquer coisa depender dele
+        //visualBodyCollider = visualBody.GetComponent<SphereCollider>();
 
         jumpHeight = 1.2f;
         physicsJumpForce = 6f;
 
-        // Restaura o footReference e o offset originais
         footReference = originalFootReference;
         footYOffset = (footReference != null) ? footReference.localPosition.y : 0f;
 
         controller.height = standingHeight;
         controller.center = new Vector3(0f, footYOffset + standingHeight / 2f, 0f);
+
+        // Força a reaplicação do modo, mesmo que o bool não tenha mudado
+        ApplyMovementMode();
     }
 
     /// <summary>
@@ -200,6 +201,7 @@ public class ThirdPhysicPersonController : MonoBehaviour
         //gameObject.layer = LayerMaskToLayer(newObjectLayer);
 
         visualBody = objectBody?.transform;
+        OriginalBody.transform.position = objectBody.transform.position;
 
         controller.height = controllerHeight;
         controller.center = new Vector3(0f, footYOffset + controllerHeight / 2f, 0f);
@@ -327,6 +329,7 @@ public class ThirdPhysicPersonController : MonoBehaviour
     {
         if (usePhysicsMovement)
         {
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
             controller.enabled = false;
             if (visualBodyCollider != null) visualBodyCollider.enabled = true; // agora o Rigidbody tem com o que colidir
             rb.isKinematic = false;
