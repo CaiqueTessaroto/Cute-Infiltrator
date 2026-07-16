@@ -121,9 +121,12 @@ public class ThirdPhysicPersonController : MonoBehaviour
         groundMask = originalGroundMask;
         gameObject.layer = originalLayer;
         //rb.excludeLayers = originalExcludeLayers;
+        
+        rb.isKinematic = false;
         controller.excludeLayers = 0;
 
         jumpHeight = 1.2f;
+        physicsJumpForce = 6f;
 
         // Restaura o footReference e o offset originais
         footReference = originalFootReference;
