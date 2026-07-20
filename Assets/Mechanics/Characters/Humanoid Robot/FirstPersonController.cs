@@ -48,6 +48,9 @@ public class FirstPersonController : MonoBehaviour
     [Tooltip("Altura da câmera agachado, relativa ao pé do personagem.")]
     public float crouchCameraY = 0.9f;
 
+    [Header("Animação")]
+    public CharacterAnimatorController animController;
+
     private CharacterController controller;
     private Vector3 velocity;
     private float pitch = 0f;
@@ -134,6 +137,9 @@ public class FirstPersonController : MonoBehaviour
         Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
         move = Vector3.ClampMagnitude(move, 1f);
 
+        if (animController != null)
+            animController.SetMovementSpeed(move.magnitude);
+
         float currentSpeed = isCrouching ? crouchSpeed : walkSpeed;
         controller.Move(move * currentSpeed * Time.deltaTime);
 
@@ -141,6 +147,9 @@ public class FirstPersonController : MonoBehaviour
         if (jumpAction.action.WasPressedThisFrame() && isGrounded && !isCrouching)
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+
+            if (animController != null)
+                animController.TriggerJump();
         }
 
         velocity.y += gravity * Time.deltaTime;
