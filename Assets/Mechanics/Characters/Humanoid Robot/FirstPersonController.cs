@@ -84,8 +84,8 @@ public class FirstPersonController : MonoBehaviour
         // Assim o collider fica alinhado ao chão independente de onde o pivot do modelo está.
         footYOffset = (footReference != null) ? footReference.localPosition.y : 0f;
 
-        controller.height = standingHeight;
-        controller.center = new Vector3(0f, footYOffset + standingHeight / 2f, 0f);
+        standingHeight = controller.height;
+        //controller.center = new Vector3(0f, footYOffset + standingHeight / 2f, 0f);
 
         if (cameraTransform != null)
         {
@@ -164,7 +164,7 @@ public class FirstPersonController : MonoBehaviour
 
         // Suaviza a transição de altura do CharacterController
         controller.height = Mathf.Lerp(controller.height, targetHeight, crouchTransitionSpeed * Time.deltaTime);
-        controller.center = new Vector3(0f, footYOffset + controller.height / 2f, 0f);
+        //controller.center = new Vector3(0f, footYOffset + controller.height / 2f, 0f);
 
         // Suaviza a altura da câmera
         if (cameraTransform != null)

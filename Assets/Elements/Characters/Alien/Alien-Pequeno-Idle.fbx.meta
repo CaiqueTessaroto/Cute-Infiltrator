@@ -1,14 +1,9 @@
 fileFormatVersion: 2
-guid: e2ec83e7ef4b428439ed38c14f807d8a
+guid: c5b37c49ff2cb794192c2e925aac1bd6
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Alien-Pequeno
-    second: {fileID: 2100000, guid: a7e356697c9f8e247be52cc16da653aa, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
