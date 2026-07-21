@@ -77,6 +77,7 @@ public class RobotArmOverride : MonoBehaviour
             return;
 
         Vector3 direction = (targetPoint - replacementArm.position).normalized;
+
         if (direction.sqrMagnitude < 0.0001f)
             return; // evita LookRotation com direção zero (braço e alvo no mesmo ponto)
 
