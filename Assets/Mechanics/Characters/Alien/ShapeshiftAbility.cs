@@ -78,9 +78,16 @@ public class ShapeshiftAbility : MonoBehaviour
             detectionRange = detectionRangeOriginal;
         }
 
-        if (ballAbilityAction.action.WasPressedThisFrame() && (currentForm != BallFormData || originalForm == true))
+        if (ballAbilityAction.action.WasPressedThisFrame())
         {
-            TransformInto(BallFormData);
+            if (currentForm != BallFormData || originalForm == true)
+                TransformInto(BallFormData);
+            else
+            {
+                originalForm = true;
+                controller.ApllyOriginalForm();
+                detectionRange = detectionRangeOriginal;
+            }
         }
 
     }
