@@ -90,7 +90,6 @@ public class ThirdPhysicPersonController : MonoBehaviour
     public float cameraCollisionRadius = 0.2f;
 
     [Header("Corpo / Câmera")]
-    public float standingHeight = 2f;
     [Tooltip("Altura do pivot da câmera, relativa ao pé do personagem.")]
     public float pivotY = 1.6f;
 
@@ -133,8 +132,8 @@ public class ThirdPhysicPersonController : MonoBehaviour
         footReference = originalFootReference;
         footYOffset = (footReference != null) ? footReference.localPosition.y : 0f;
 
-        controller.height = 0;
-        controller.center = new Vector3(0f, footYOffset + standingHeight / 2f, 0f);
+        //controller.height = 0;
+        controller.center = new Vector3(0f, 0.2f, 0f);
 
         // Volta pro Alien: religa o Animator dele, caso a referência tenha sido zerada
         // por um ApplyForm anterior (ex: vindo da forma de bola).
@@ -215,8 +214,10 @@ public class ThirdPhysicPersonController : MonoBehaviour
         visualBody = objectBody?.transform;
         OriginalBody.transform.position = objectBody.transform.position;
 
-        controller.height = controllerHeight;
-        controller.center = new Vector3(0f, footYOffset + controllerHeight / 2f, 0f);
+        //controller.height = controllerHeight;
+        //controller.center = new Vector3(0f, controllerHeight, 0f);
+        controller.center = new Vector3(0f, 0.2f, 0f);
+        //controller.center = new Vector3(0f, controllerHeight / 2f, 0f);
 
         pivotLocalPos = cameraPivot.localPosition;
         pivotLocalPos.y = cameraHeight;
@@ -286,8 +287,9 @@ public class ThirdPhysicPersonController : MonoBehaviour
         originalFootReference = footReference;
         footYOffset = (footReference != null) ? footReference.localPosition.y : 0f;
 
-        controller.height = standingHeight;
-        controller.center = new Vector3(0f, footYOffset + standingHeight / 2f, 0f);
+        //standingHeight =  controller.height;
+        //controller.center = new Vector3(0f, footYOffset + standingHeight / 2f, 0f);
+        //controller.center = new Vector3(0f, 0.2f, 0f);
 
         if (cameraPivot != null)
         {
