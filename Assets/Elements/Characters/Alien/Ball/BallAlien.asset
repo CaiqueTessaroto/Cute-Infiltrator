@@ -10,14 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a9c8a6102c57d0c42bd03fbe153925c5, type: 3}
-  m_Name: Alien
+  m_Name: BallAlien
   m_EditorClassIdentifier: Assembly-CSharp::TransformableObjectData
   formName: Alien
   visualPrefab: {fileID: 7665876428811635560, guid: 4883fe67d94a06c44887dabb1d08a88f, type: 3}
   visualScale: 1
+  usePhysicsMovement: 1
   colliderRadius: 0.5
   controllerHeight: 1
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  excludedLayers:
+    serializedVersion: 2
+    m_Bits: 0
   moveSpeed: 5
   jumpForce: 6
   canJump: 1
+  detectionRange: 0.5
   specialAbilityId: 

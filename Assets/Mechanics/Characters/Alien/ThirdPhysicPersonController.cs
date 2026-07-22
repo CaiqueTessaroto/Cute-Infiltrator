@@ -113,7 +113,7 @@ public class ThirdPhysicPersonController : MonoBehaviour
     {
         visualBody = OriginalBody.transform;
         OriginalBody.SetActive(true);
-        usePhysicsMovement = true;
+        usePhysicsMovement = false;
         DestroyClonedChildren();
 
         transform.localScale = originalScale;

@@ -7,6 +7,7 @@ public class ShapeshiftAbility : MonoBehaviour
     [Header("Input")]
     [SerializeField] private InputActionReference transformAction; // botão de "virar"
     [SerializeField] private InputActionReference revertAction;    // botão de "voltar ao normal" (pode ser o mesmo botão)
+    [SerializeField] private InputActionReference ballAbilityAction;
 
     [Header("Detecção")]
     [Tooltip("Centro da esfera de detecção - geralmente o próprio player.")]
@@ -17,10 +18,8 @@ public class ShapeshiftAbility : MonoBehaviour
     [SerializeField] private Transform aimDirectionReference;
     [SerializeField] private LayerMask transformableLayers;
 
-    [Header("Forma original (pra poder reverter)")]
-    [SerializeField] private TransformableObjectData originalFormData;
-
     [Header("Formas")]
+    [SerializeField] private TransformableObjectData BallFormData;
     public TransformableObjectData basicData;
 
 
@@ -31,6 +30,7 @@ public class ShapeshiftAbility : MonoBehaviour
     private TransformableObject currentTarget;   // o que está mirando agora
     private TransformableObjectData currentForm; // forma atual do player
     private GameObject spawnedVisual;
+    private bool originalForm = true;
 
     void Awake()
     {
@@ -43,12 +43,14 @@ public class ShapeshiftAbility : MonoBehaviour
     {
         transformAction.action.Enable();
         revertAction.action.Enable();
+        ballAbilityAction.action.Enable();
     }
 
     void OnDisable()
     {
         transformAction.action.Disable();
         revertAction.action.Disable();
+        ballAbilityAction.action.Disable();
     }
 
     void Update()
@@ -59,7 +61,9 @@ public class ShapeshiftAbility : MonoBehaviour
         {
             if (currentTarget != null)
             {
-                TransformInto(currentTarget);
+                TransformableObjectData data = currentTarget.data != null ? currentTarget.data : basicData;
+                TransformInto(data, currentTarget);
+
             }
             else
             {
@@ -67,12 +71,18 @@ public class ShapeshiftAbility : MonoBehaviour
             }
         }
 
-        if (revertAction.action.WasPressedThisFrame() && currentForm != originalFormData)
+        if (revertAction.action.WasPressedThisFrame() && originalForm == false)
         {
+            originalForm = true;
             controller.ApllyOriginalForm();
             detectionRange = detectionRangeOriginal;
-            //TransformInto(originalFormData);
         }
+
+        if (ballAbilityAction.action.WasPressedThisFrame() && (currentForm != BallFormData || originalForm == true))
+        {
+            TransformInto(BallFormData);
+        }
+
     }
 
     void DetectTarget()
@@ -122,23 +132,27 @@ public class ShapeshiftAbility : MonoBehaviour
         }
     }
 
-    void TransformInto(TransformableObject target)
+    void TransformInto(TransformableObjectData data, TransformableObject target = null)
     {
-        TransformableObjectData data = target.data != null ? target.data : basicData;
-
-        detectionRange = data.detectionRange;
-
         if (data == null)
         {
-            Debug.LogError($"[Shapeshift] '{target.name}' não tem TransformableObjectData atribuído.");
+            if (target != null)
+                Debug.LogWarning($"[Shapeshift] '{target.name}' não tem TransformableObjectData atribuído.");
+            else
+                Debug.LogWarning($"[Shapeshift] '{data.formName}' não tem visual disponível (nem visualPrefab, nem gameObject de origem).");
+
             return;
         }
+
+        originalForm = false;
+
+        detectionRange = data.detectionRange;
 
         currentForm = data;
 
         if (spawnedVisual != null) Destroy(spawnedVisual);
 
-        GameObject visualSource = target.GetVisualSource();
+        GameObject visualSource = target != null ? target.GetVisualSource() : data.visualPrefab;
 
         Transform footChild = null;
 
