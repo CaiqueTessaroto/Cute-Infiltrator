@@ -96,8 +96,6 @@ public class ThirdPhysicPersonController : MonoBehaviour
 
     [Header("Trasformação")]
     public GameObject OriginalBody;
-    [Tooltip("Escala do player na forma original para teste (ex: personagem pequeno = 0.4,0.4,0.4).")]
-    [SerializeField] private Vector3 originalScale = new Vector3(0.4f, 0.4f, 0.4f);
     private Transform originalFootReference;
 
     private CharacterController controller;
@@ -119,10 +117,12 @@ public class ThirdPhysicPersonController : MonoBehaviour
         usePhysicsMovement = false;
         DestroyClonedChildren();
 
-        transform.localScale = originalScale;
-
         groundMask = originalGroundMask;
         gameObject.layer = originalLayer;
+
+        pivotLocalPos = cameraPivot.localPosition;
+        pivotLocalPos.y = footYOffset + pivotY;
+        cameraPivot.localPosition = pivotLocalPos;
 
         // Reatribui o collider correto ANTES de qualquer coisa depender dele
         //visualBodyCollider = visualBody.GetComponent<SphereCollider>();
@@ -133,7 +133,7 @@ public class ThirdPhysicPersonController : MonoBehaviour
         footReference = originalFootReference;
         footYOffset = (footReference != null) ? footReference.localPosition.y : 0f;
 
-        controller.height = standingHeight;
+        controller.height = 0;
         controller.center = new Vector3(0f, footYOffset + standingHeight / 2f, 0f);
 
         // Volta pro Alien: religa o Animator dele, caso a referência tenha sido zerada
@@ -172,7 +172,7 @@ public class ThirdPhysicPersonController : MonoBehaviour
         }
     }
 
-    public void ApplyForm(float colliderRadius, float controllerHeight, float moveSpeed, float jumpForce, bool physicsMovement, LayerMask newGroundMask, LayerMask excludedLayers, GameObject objectBody, Transform footReferenceOverride = null)
+    public void ApplyForm(float colliderRadius, float controllerHeight, float moveSpeed, float jumpForce, float cameraHeight, bool physicsMovement, LayerMask newGroundMask, LayerMask excludedLayers, GameObject objectBody, Transform footReferenceOverride = null)
     {
 
         usePhysicsMovement = physicsMovement;
@@ -218,10 +218,13 @@ public class ThirdPhysicPersonController : MonoBehaviour
         controller.height = controllerHeight;
         controller.center = new Vector3(0f, footYOffset + controllerHeight / 2f, 0f);
 
+        pivotLocalPos = cameraPivot.localPosition;
+        pivotLocalPos.y = cameraHeight;
+        cameraPivot.localPosition = pivotLocalPos;
+
         if (visualBodyCollider != null)
             visualBodyCollider.radius = colliderRadius;
 
-        transform.localScale = Vector3.one;
     }
 
     private int LayerMaskToLayer(LayerMask mask)

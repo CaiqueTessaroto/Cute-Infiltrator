@@ -192,6 +192,7 @@ public class ShapeshiftAbility : MonoBehaviour
             controllerHeight: data.controllerHeight,
             moveSpeed: data.moveSpeed,
             jumpForce: data.jumpForce,
+            cameraHeight: data.cameraHeight,
             physicsMovement: data.usePhysicsMovement,
             newGroundMask: data.groundMask,
             excludedLayers: data.excludedLayers,

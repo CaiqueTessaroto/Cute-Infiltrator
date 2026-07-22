@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TransformableObjectData
   formName: Alien
   visualPrefab: {fileID: 7665876428811635560, guid: 4883fe67d94a06c44887dabb1d08a88f, type: 3}
-  visualScale: 1
+  visualScale: 0.4
+  cameraHeight: 0.1
   usePhysicsMovement: 1
   colliderRadius: 0.5
   controllerHeight: 1

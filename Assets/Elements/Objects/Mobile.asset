@@ -15,6 +15,7 @@ MonoBehaviour:
   formName: Mobile
   visualPrefab: {fileID: 0}
   visualScale: 1
+  cameraHeight: 0.1
   usePhysicsMovement: 1
   colliderRadius: 0.5
   controllerHeight: 1

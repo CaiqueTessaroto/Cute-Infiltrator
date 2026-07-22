@@ -10,6 +10,7 @@ public class TransformableObjectData : ScriptableObject
     [Tooltip("Prefab (ou mesh) que substitui o visualBody do player enquanto nessa forma.")]
     public GameObject visualPrefab;
     public float visualScale = 1f;
+    public float cameraHeight = 1f;
 
     [Header("Física / Collider")]
     public bool usePhysicsMovement = true;
