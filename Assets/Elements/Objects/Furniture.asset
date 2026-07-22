@@ -15,9 +15,10 @@ MonoBehaviour:
   formName: Furniture
   visualPrefab: {fileID: 0}
   visualScale: 1
+  cameraHeight: 1
   usePhysicsMovement: 0
   colliderRadius: 0.5
-  controllerHeight: 1
+  controllerHeight: 0.1
   groundMask:
     serializedVersion: 2
     m_Bits: 1535

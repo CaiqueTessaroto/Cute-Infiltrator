@@ -476,6 +476,8 @@ public class ThirdPhysicPersonController : MonoBehaviour
 
         // Origem logo acima do pé, só o suficiente pra sphere não nascer cravada no chão
         Vector3 origin = footReference.position + Vector3.up * radius;
+        origin.y = origin.y + 0.1f;
+        
         float castDistance = radius + groundCheckMargin;
 
         bool hit = Physics.SphereCast(origin, radius, Vector3.down, out RaycastHit hitInfo, castDistance, groundMask, QueryTriggerInteraction.Ignore);

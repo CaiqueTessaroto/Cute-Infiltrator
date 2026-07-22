@@ -16,7 +16,7 @@ MonoBehaviour:
   visualPrefab: {fileID: 0}
   visualScale: 1
   cameraHeight: 0.1
-  usePhysicsMovement: 1
+  usePhysicsMovement: 0
   colliderRadius: 0.5
   controllerHeight: 1
   groundMask:
@@ -26,7 +26,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   moveSpeed: 5
-  jumpForce: 6
+  jumpForce: 2
   canJump: 1
   detectionRange: 1
   specialAbilityId: 
