@@ -9371,10 +9371,11 @@ MonoBehaviour:
   cameraTransform: {fileID: 1540118584}
   visualBody: {fileID: 1568736661}
   footReference: {fileID: 1534939663}
+  alienAnimator: {fileID: 1936452996}
   moveAction: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   lookAction: {fileID: -5630151704836100654, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   jumpAction: {fileID: -2099379676528639254, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  usePhysicsMovement: 1
+  usePhysicsMovement: 0
   walkSpeed: 5
   gravity: -20
   jumpHeight: 1.2
@@ -21138,6 +21139,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b37c49ff2cb794192c2e925aac1bd6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1936452995}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b37c49ff2cb794192c2e925aac1bd6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1936452996}
   m_SourcePrefab: {fileID: 100100000, guid: c5b37c49ff2cb794192c2e925aac1bd6, type: 3}
 --- !u!4 &1568736661 stripped
 Transform:
@@ -24982,6 +24986,22 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.225
   m_Center: {x: 0, y: 0.225, z: 0}
+--- !u!114 &1936452996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1936452993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2108cae71a6dac047b9d6f65be7246b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AlienCharacterAnimatorController
+  speedParam: Speed
+  groundedParam: Grounded
+  jumpParam: Jump
+  speedDampTime: 0.1
 --- !u!1 &1949588013
 GameObject:
   m_ObjectHideFlags: 0

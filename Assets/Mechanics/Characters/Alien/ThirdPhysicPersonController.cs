@@ -5,14 +5,15 @@ using UnityEngine.InputSystem;
 /// Controlador de personagem em terceira pessoa usando o novo Input System.
 /// Suporta DOIS modos de movimento, alternáveis por um bool no Inspector (ou em runtime):
 ///
-///   - Transform (CharacterController): o modo original. Movimento "kinemático",
-///     sem física de verdade. O corpo visual apenas gira (Slerp) para encarar a
-///     direção do movimento, sem realmente "rolar".
+///   - Transform (CharacterController): o modo do Alien (OriginalBody). Movimento
+///     "kinemático", sem física de verdade, com animação via AlienCharacterAnimatorController.
 ///
-///   - Física (Rigidbody): a cápsula raiz vira um corpo físico de verdade (gravidade,
-///     colisões respondendo com física, pode ser empurrada/empurrar outros Rigidbodies).
-///     Além disso, a esfera visual GIRA de verdade como se estivesse rolando pelo chão,
-///     calculado a partir da velocidade e do raio da esfera (v = ω * r).
+///   - Física (Rigidbody): usado por qualquer forma transformada via ApplyForm com
+///     physicsMovement = true (ex: a habilidade de virar bola). A cápsula raiz vira um
+///     corpo físico de verdade (gravidade, colisões respondendo com física, pode ser
+///     empurrada/empurrar outros Rigidbodies). Além disso, o visual GIRA de verdade
+///     como se estivesse rolando pelo chão, calculado a partir da velocidade e do raio
+///     da esfera (v = ω * r).
 ///
 /// Requer um CharacterController E um Rigidbody no mesmo GameObject (a "cápsula").
 /// O script ativa/desativa cada um automaticamente conforme o modo escolhido, então
@@ -20,8 +21,8 @@ using UnityEngine.InputSystem;
 ///
 /// HIERARQUIA SUGERIDA:
 /// Player (CharacterController + Rigidbody + este script)
+///  ├── OriginalBody (o Alien: visual com animação, modo Transform)
 ///  ├── Foot (Empty, na altura do chão, mesma ideia do FirstPersonController)
-///  ├── Visual (esfera verde, filha, representando o personagem por enquanto - sem animação)
 ///  ├── CameraPivot (Empty, na altura dos "ombros"/cabeça - só marca o CENTRO da órbita, não gira)
 ///  └── Main Camera (NÃO precisa ser filha do pivot - a posição dela é calculada em
 ///       espaço de mundo todo frame, orbitando ao redor do CameraPivot)
@@ -44,6 +45,8 @@ public class ThirdPhysicPersonController : MonoBehaviour
     public Transform visualBody;
     [Tooltip("Objeto vazio filho, posicionado no 'pé' do personagem. Usado para calcular o offset do collider, igual ao FirstPersonController.")]
     public Transform footReference;
+    [Tooltip("Controlador do Animator do Alien (OriginalBody, modo Transform). Fica vazio quando a forma atual não tem esse Animator (qualquer forma aplicada via ApplyForm, incluindo a bola).")]
+    public AlienCharacterAnimatorController alienAnimator;
 
     [Header("Inputs (New Input System)")]
     [SerializeField] private InputActionReference moveAction;
@@ -133,6 +136,13 @@ public class ThirdPhysicPersonController : MonoBehaviour
         controller.height = standingHeight;
         controller.center = new Vector3(0f, footYOffset + standingHeight / 2f, 0f);
 
+        // Volta pro Alien: religa o Animator dele, caso a referência tenha sido zerada
+        // por um ApplyForm anterior (ex: vindo da forma de bola).
+        if (alienAnimator == null && OriginalBody != null)
+        {
+            alienAnimator = OriginalBody.GetComponentInChildren<AlienCharacterAnimatorController>();
+        }
+
         // Força a reaplicação do modo, mesmo que o bool não tenha mudado
         ApplyMovementMode();
     }
@@ -168,6 +178,9 @@ public class ThirdPhysicPersonController : MonoBehaviour
         usePhysicsMovement = physicsMovement;
         if (!usePhysicsMovement)
             rb.isKinematic = true;
+
+        // Nenhuma forma aplicada via ApplyForm (inclusive a bola) usa o Animator do Alien.
+        alienAnimator = null;
 
         // Redefine o footReference pra essa forma específica
         if (footReferenceOverride != null)
@@ -258,6 +271,13 @@ public class ThirdPhysicPersonController : MonoBehaviour
             {
                 Debug.LogWarning("ThirdPersonController: a SphereCollider do visualBody está marcada como 'Is Trigger' - ela não vai gerar colisão física de verdade. Desmarque 'Is Trigger' para o modo Física funcionar.", this);
             }
+        }
+
+        // Se começar como o Alien e a referência não tiver sido setada no Inspector,
+        // tenta encontrar o Animator automaticamente no OriginalBody.
+        if (!usePhysicsMovement && alienAnimator == null && OriginalBody != null)
+        {
+            alienAnimator = OriginalBody.GetComponentInChildren<AlienCharacterAnimatorController>();
         }
 
         originalFootReference = footReference;
@@ -361,7 +381,7 @@ public class ThirdPhysicPersonController : MonoBehaviour
     }
 
     // ---------------------------------------------------------------
-    // MODO TRANSFORM (CharacterController) - comportamento original
+    // MODO TRANSFORM (CharacterController) - Alien, com animação
     // ---------------------------------------------------------------
     void HandleMovementTransform()
     {
@@ -397,13 +417,26 @@ public class ThirdPhysicPersonController : MonoBehaviour
 
         controller.Move(moveDir * walkSpeed * Time.deltaTime);
 
+        bool justJumped = false;
         if (jumpAction.action.WasPressedThisFrame() && isGrounded)
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            justJumped = true;
         }
 
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+
+        // Repassa o estado de movimento para o Animator do Alien, se essa forma tiver um.
+        if (alienAnimator != null)
+        {
+            alienAnimator.SetMovementSpeed(inputDir.magnitude);
+            alienAnimator.SetGrounded(isGrounded);
+            if (justJumped)
+            {
+                alienAnimator.TriggerJump();
+            }
+        }
     }
     // ---------------------------------------------------------------
     // MODO FÍSICA (Rigidbody) - esfera rola de verdade
